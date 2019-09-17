@@ -10,6 +10,22 @@ Promise.all([
   faceapi.nets.ssdMobilenetv1.loadFromUri('models')
 ]).then(start)
 
+function handleDetections(detections){
+  console.log(detections);
+  const container = document.createElement('div')
+  container.style.position = 'relative'
+  document.body.append(container);
+  container.append('count:'+detections.length)
+}
+
+function handleResult(result){
+  console.log(result);
+  const container = document.createElement('div')
+  container.style.position = 'relative'
+  document.body.append(container);
+  container.append(result.toString())
+}
+
 async function start() {
   const container = document.createElement('div')
   container.style.position = 'relative'
@@ -29,12 +45,14 @@ async function start() {
     const displaySize = { width: image.width, height: image.height }
     faceapi.matchDimensions(canvas, displaySize)
     const detections = await faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors()
+    handleDetections(detections);
     const resizedDetections = faceapi.resizeResults(detections, displaySize)
     const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor))
     results.forEach((result, i) => {
       const box = resizedDetections[i].detection.box
       const drawBox = new faceapi.draw.DrawBox(box, { label: result.toString() })
       drawBox.draw(canvas)
+      handleResult(result)
     })
   })
 }
