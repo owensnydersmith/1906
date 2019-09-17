@@ -1,3 +1,7 @@
+if (location.protocol !== "https:") {
+  location.protocol = "https:";
+}
+
 const imageUpload = document.getElementById('imageUpload')
 
 Promise.all([
@@ -41,17 +45,9 @@ function loadLabeledImages() {
     labels.map(async label => {
       const descriptions = []
       for (let i = 1; i <= 2; i++) {
-        img=null;
-        try{
         let img = await faceapi.fetchImage(`labeled_images/${label}/${i}.jpg`)
-        }
-        catch (error){
-         console.error(error) 
-        }
-        if(img) {
         const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
         descriptions.push(detections.descriptor)
-        }
       }
 
       return new faceapi.LabeledFaceDescriptors(label, descriptions)
